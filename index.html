@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Deskmate</title>
+    <link rel="stylesheet" href="styles.fb94fcac3a.css" />
+    <style>
+.web-guide summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 10px; }
+.web-guide:not([open]) { gap: 0; }
+.web-guide summary::-webkit-details-marker { display: none; }
+.web-guide summary::after { content: "▾"; color: #8fd6ff; }
+.web-guide[open] summary::after { content: "▴"; }
+.web-guide .web-guide-lang { margin-left: auto; min-height: 28px; padding: 0 10px; font-size: 0.78rem; background: rgba(143, 214, 255, 0.12); box-shadow: inset 0 0 0 1px rgba(143, 214, 255, 0.36); color: #8fd6ff; }
+.web-guide .web-guide-body { display: grid; gap: 10px; }
+.web-guide .web-guide-body[hidden] { display: none; }
+.web-guide ol { margin: 0; padding-left: 1.4em; display: grid; gap: 4px; font-size: 0.9rem; line-height: 1.5; }
+.web-guide .web-guide-shot { display: block; margin: 6px 0 2px; max-width: 100%; height: auto; border-radius: 8px; }
+.web-guide .web-guide-tip { margin: 0; padding: 8px 10px; border-radius: 6px; background: rgba(143, 214, 255, 0.08); font-size: 0.85rem; line-height: 1.5; }
+html[lang="ja"] .i18n[lang="en"], html[lang="en"] .i18n[lang="ja"] { display: none; }
+html.screenshot .copyright-line { visibility: hidden; }
+.app-shell { grid-template-columns: 400px minmax(420px, 1fr); }
+.web-guide-pane { order: -1; justify-content: flex-start; border-left: 0; border-right: 1px solid rgba(255, 255, 255, 0.08); }
+.web-top { --web-side-width: 190px; --web-side: clamp(16px, 2.5vw, 32px); position: absolute; inset: 0 0 auto 0; z-index: 8; pointer-events: none; }
+.web-top > * { pointer-events: auto; }
+.web-top-side { position: absolute; top: 16px; right: var(--web-side); width: var(--web-side-width); display: grid; gap: 12px; }
+.web-top .stage-logo { position: static; justify-items: end; pointer-events: none; }
+.web-top .stage-logo strong { font-size: clamp(1.5rem, 2.6vw, 2.5rem); }
+.web-top-side #startButton { min-height: 56px; }
+.web-top-side .status-line { background: rgba(16, 17, 20, 0.9); color: rgba(246, 241, 232, 0.8); }
+/* 画面下の利用条件と著作権の表示。手元版の 0.68rem・不透明度 0.38 では小さく暗すぎた（2026-11-05、著者の指摘）。 */
+.web-guide-pane .copyright-line { font-size: 0.8rem; line-height: 1.5; color: rgba(246, 241, 232, 0.72); }
+.web-guide-pane .copyright-line a { white-space: nowrap; }
+.web-top-side .status-line[hidden] { display: none; }
+@media (min-width: 821px) { .web-guide-pane { position: sticky; top: 0; max-height: 100vh; max-height: 100svh; overflow-y: auto; } }
+.web-tuning .web-tuning-body { display: grid; gap: 4px; }
+.web-tuning .web-tuning-body.is-disabled .web-tuning-group { opacity: 0.45; }
+.web-tuning-group { padding: 8px 0 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+.web-tuning-group h3 { margin: 0 0 6px; font-size: 0.86rem; color: #8fd6ff; }
+.web-tuning-group details { margin-top: 6px; }
+/* 「はじめに」の summary の作り（.web-guide summary）が中の「詳細」にも掛かるので、普通の開閉の印に戻す。 */
+.web-tuning-group summary { display: list-item; list-style: disclosure-closed; cursor: pointer; font-size: 0.78rem; color: rgba(246, 241, 232, 0.6); }
+.web-tuning-group details[open] > summary { list-style: disclosure-open; }
+.web-tuning .web-tuning-group summary::after { content: none; }
+.web-tuning-group details[open] summary { margin-bottom: 6px; }
+.web-tuning-row { margin: 0 0 8px; }
+.web-tuning-row-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 0.84rem; }
+.web-tuning-row.is-changed label::after { content: "•"; margin-left: 4px; color: #ffb38f; }
+.web-tuning-value { font-size: 0.78rem; color: #8fd6ff; font-variant-numeric: tabular-nums; }
+.web-tuning-row input[type="range"] { width: 100%; margin: 2px 0 0; accent-color: #8fd6ff; }
+.web-tuning-hint { margin: 0; font-size: 0.72rem; line-height: 1.4; color: rgba(246, 241, 232, 0.5); }
+.web-tuning-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+.web-tuning-actions button { min-height: 32px; font-size: 0.8rem; background: rgba(143, 214, 255, 0.12); box-shadow: inset 0 0 0 1px rgba(143, 214, 255, 0.36); color: #8fd6ff; }
+.web-tuning-status { min-height: 1.2em; margin: 0; font-size: 0.78rem; color: rgba(246, 241, 232, 0.72); }
+.web-tuning-note { margin: 0; font-size: 0.72rem; color: rgba(246, 241, 232, 0.5); }
+    </style>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="stage is-loading-live2d" aria-label="Avatar stage">
+        <div class="web-top">
+          <div class="web-top-side">
+            <div class="stage-logo" aria-label="Deskmate logo">
+          <strong>Deskmate</strong>
+        </div>
+            <div class="controls">
+          <button id="startButton" type="button">アバター開始</button>
+          <div class="input-meter" id="inputMeter" hidden aria-hidden="true"><span id="inputMeterFill"></span></div>
+        </div>
+            <div class="status-line" aria-live="polite">
+          <p id="transcriptText">未接続</p>
+        </div>
+          </div>
+        </div>
+        <canvas class="vrm-canvas" id="vrmCanvas" aria-label="3D avatar" hidden></canvas>
+        <div class="avatar avatar-fallback" id="avatar">
+          <div class="avatar-hair-back"></div>
+          <div class="avatar-hair-front"></div>
+          <div class="avatar-face">
+            <div class="brow brow-left"></div>
+            <div class="brow brow-right"></div>
+            <div class="eye eye-left"><div class="pupil"></div></div>
+            <div class="eye eye-right"><div class="pupil"></div></div>
+            <div class="blush blush-left"></div>
+            <div class="blush blush-right"></div>
+            <div class="mouth" id="mouth"></div>
+          </div>
+          <div class="avatar-neck"></div>
+          <div class="collar"></div>
+          <div class="avatar-body"></div>
+        </div>
+      </section>
+
+      <aside class="control-panel web-guide-pane">
+        <details class="topic-panel web-guide" id="webGuide" open>
+          <summary>
+            <span class="panel-title">
+              <h2 id="webGuideTitle">はじめに</h2>
+              <span class="eyebrow" id="webGuideEyebrow">How to start</span>
+            </span>
+            <button class="web-guide-lang" id="webGuideLang" type="button">English</button>
+          </summary>
+          <div class="web-guide-body" lang="ja">
+            <ol>
+              <li>パソコンの Chrome か Edge で、別のタブを開き、声が出るサービスを開きます。音声対話 AI でも、オンライン会議でもかまいません。</li>
+              <li>このタブに戻り、「アバター開始」を押します。</li>
+              <li>共有の画面で、上の「タブ」の欄（Chrome では「Chrome タブ」、Edge では「Microsoft Edge タブ」）を選び、声が出ているタブを選びます。</li>
+              <li>下の、タブの音声を共有する項目がオンになっていることを確かめて、「共有」を押します。</li>
+              <li>そのタブから声が聞こえると、アバターが動きます。</li>
+            </ol>
+            <p class="web-guide-tip">タブの外で声が鳴るサービス（ブラウザのサイドパネルなど）では、共有の画面で「画面全体」を選び、システムの音声を共有する項目をオンにします。この場合、アバターは PC で鳴るすべての音に反応します。</p>
+            <p class="web-guide-tip">Tips: 2 つのタブを 1 画面に並べると使いやすくなります。Chrome では、Ctrl キーを押しながら 2 枚のタブをクリックして選び、右クリックで分割ビューの項目を選びます。Edge では、分割画面の機能を使います。Enjoy!</p>
+          </div>
+          <div class="web-guide-body" lang="en" hidden>
+            <ol>
+              <li>In Chrome or Edge on a computer, open another tab with a service that plays a voice: a voice AI, an online meeting, or anything else.</li>
+              <li>Come back to this tab and press "Start avatar".</li>
+              <li>In the sharing dialog, choose the tab option at the top ("Chrome Tab" in Chrome, "Microsoft Edge Tab" in Edge), then select the tab playing the voice.</li>
+              <li>Make sure the option to share tab audio at the bottom is on, then press "Share".</li>
+              <li>When you hear a voice from that tab, the avatar moves.</li>
+            </ol>
+            <p class="web-guide-tip">For a service whose voice plays outside any tab (such as a browser side panel), choose "Entire screen" in the sharing dialog and turn on the option to share system audio. The avatar then responds to every sound your PC plays.</p>
+            <p class="web-guide-tip">Tips: The two tabs are easier to use side by side on one screen. In Chrome, hold Ctrl and click both tabs to select them, then right-click and choose the split view item. In Edge, use the split screen feature. Enjoy!</p>
+          </div>
+        </details>
+        <details class="topic-panel web-guide web-tuning" id="webTuning">
+          <summary>
+            <span class="panel-title">
+              <h2 id="webTuningTitle">アバター調整</h2>
+              <span class="eyebrow" id="webTuningEyebrow">Adjust</span>
+            </span>
+          </summary>
+          <div class="web-tuning-body">
+            <div class="web-tuning-actions">
+              <button type="button" id="webTuningReset">既定に戻す</button>
+              <button type="button" id="webTuningCopy">値をコピー</button>
+            </div>
+            <p class="web-tuning-status" aria-live="polite"></p>
+            <p class="web-tuning-note"></p>
+          </div>
+        </details>
+        <p class="copyright-line">
+          <span class="i18n" lang="ja">本β版は営利目的・組織の業務での利用、複製、改変、再配布、解析、ほかのソフトウェアの作成への利用はできません。</span>
+          <span class="i18n" lang="en">This beta may not be used for commercial or business purposes, copied, modified, redistributed, analysed, or used to create other software.</span><br />
+          © 2026 Hiroshi Hamada. All rights reserved. · <a href="terms.html"><span class="i18n" lang="ja">β版利用規約</span><span class="i18n" lang="en">Beta terms</span></a>
+        </p>
+        <div hidden>
+        <section class="level-panel" aria-label="Avatar level progress">
+          <div class="level-line">
+            <strong id="levelValue">Lv.1</strong>
+            <strong id="xpValue">0 XP</strong>
+            <span id="xpGainStatus" aria-live="polite"></span>
+          </div>
+          <div class="level-progress" aria-hidden="true">
+            <div id="levelProgressFill"></div>
+          </div>
+          <div class="level-stats">
+            <span id="totalRunTime">累計 0:00:00</span>
+            <span id="nextLevelTime">次まで -- XP</span>
+            <span>音声 <strong id="speechTimeValue">0秒</strong></span>
+            <span>発話 <strong id="speechCountValue">0回</strong></span>
+          </div>
+          <div class="streak-panel" aria-label="Login streak">
+            <div class="streak-line">
+              <span>連続</span>
+              <strong id="streakValue">1日</strong>
+              <div class="streak-badges" id="streakBadges"></div>
+              <span id="streakBestValue">最高 --日</span>
+            </div>
+            <div class="streak-slots" id="streakSlots" aria-hidden="true"></div>
+          </div>
+        </section>
+        </div>
+      </aside>
+    </main>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/",
+          "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3.4.5/lib/three-vrm.module.js"
+        }
+      }
+    </script>
+    <script>(() => {
+  const responses = {"/api/useful-phrases":{"count":0,"phrases":[]},"/api/vrm-models":{"count":1,"models":[{"id":"3d_1","label":"3d_1","url":"models/vrm/3d_1.vrm"}]},"/api/avatar-models":{"models":[{"id":"3d_1","label":"3D 1","kind":"vrm","file":"3d_1.vrm","slot":1,"available":true}]}};
+  const nativeFetch = window.fetch.bind(window);
+  window.fetch = (input, init) => {
+    const path = typeof input === "string" ? input : input?.url;
+    if (Object.hasOwn(responses, path)) {
+      return Promise.resolve(new Response(JSON.stringify(responses[path]), {
+        status: 200,
+        headers: { "content-type": "application/json; charset=utf-8" }
+      }));
+    }
+    return nativeFetch(input, init);
+  };
+})();</script>
+    <script type="module" src="vrm-backend.a8e651ea8e.js"></script>
+    <script type="module" src="app.cb8a7cba99.js"></script>
+    <script type="module" src="tuning-panel.f6993e97d7.js"></script>
+    <script>(() => {
+  const guide = document.getElementById("webGuide");
+  if (!guide) return;
+  const LANG_KEY = "deskmateWeb.guideLang.v1";
+  const I18N = true;
+  const UI_EN = {"アバター開始":"Start avatar","アバター停止":"Stop avatar","未接続":"Not connected","共有待ち":"Waiting for sharing","動作中":"Running","簡易アバター表示":"Simple avatar","簡易アバター表示（モデル未導入）":"Simple avatar (no model installed)","3Dモデル読込失敗":"Could not load the 3D model","アバターの開始に失敗しました。":"Could not start the avatar.","この環境ではタブ音声共有を開始できません。音声反応はデスクトップ版のChrome/Edgeで使ってください。":"Tab audio sharing cannot start in this environment. Use Chrome or Edge on a desktop computer.","音声トラックを取得できませんでした。Chrome/Edgeで「タブ」を選び、「タブの音声も共有」をオンにしてください。ウィンドウ共有や画面全体共有では音声が取れない場合があります。":"No audio was captured. In Chrome or Edge, choose a tab and turn on “Also share tab audio”. Sharing a window or the entire screen may not capture audio."};
+  const PATTERNS = [["^(.+) 読込中$","Loading $1"],["^(.+) 表示中$","$1 shown"],["^(.+) を読み込めませんでした。$","Could not load $1."],["^アバター読込失敗: (.*)$","Could not load the avatar: $1"]].map(([from, to]) => [new RegExp(from), to]);
+  const read = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
+  const write = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
+  const params = new URLSearchParams(location.search);
+  // 論文の図を撮るとき（?screenshot）は、画面下の利用条件と著作権の表示を隠す。場所は空けたままにする。
+  if (params.has("screenshot")) document.documentElement.classList.add("screenshot");
+  // ?lang=en / ?lang=ja は保存した言語より優先し、保存は変えない。
+  const forced = ["ja", "en"].includes(params.get("lang")) ? params.get("lang") : null;
+  const labels = {
+    ja: { title: "はじめに", eyebrow: "How to start", button: "English" },
+    // 英語の表示では日本語の文字を一つも出さない（2026-11-03、著者の指示）。
+    en: { title: "How to start", eyebrow: "Guide", button: "Japanese" }
+  };
+  let lang = forced || read(LANG_KEY) || "en";
+  const translate = (text) => {
+    if (lang !== "en") return text;
+    if (Object.hasOwn(UI_EN, text)) return UI_EN[text];
+    for (const [pattern, to] of PATTERNS) if (pattern.test(text)) return text.replace(pattern, to);
+    return text;
+  };
+  // app.js が書いた元の文を data-ja に残し、表示だけを置き換える。自分の書き換えには反応しない。
+  const targets = I18N ? [document.getElementById("startButton"), document.getElementById("transcriptText")].filter(Boolean) : [];
+  const render = (el) => {
+    const shown = translate(el.dataset.ja);
+    el.dataset.shown = shown;
+    if (el.textContent !== shown) el.textContent = shown;
+  };
+  for (const el of targets) {
+    el.dataset.ja = el.textContent;
+    new MutationObserver(() => {
+      if (el.textContent === el.dataset.shown) return;
+      el.dataset.ja = el.textContent;
+      render(el);
+    }).observe(el, { childList: true, characterData: true, subtree: true });
+  }
+  const show = () => {
+    if (I18N) document.documentElement.lang = lang;
+    for (const body of guide.querySelectorAll(".web-guide-body")) body.hidden = body.lang !== lang;
+    document.getElementById("webGuideTitle").textContent = labels[lang].title;
+    document.getElementById("webGuideEyebrow").textContent = labels[lang].eyebrow;
+    document.getElementById("webGuideLang").textContent = labels[lang].button;
+    for (const el of targets) render(el);
+  };
+  show();
+  document.getElementById("webGuideLang").addEventListener("click", (event) => {
+    // summary の中のボタンなので、押しても欄が開閉しないようにする。
+    event.preventDefault();
+    lang = lang === "ja" ? "en" : "ja";
+    write(LANG_KEY, lang);
+    show();
+  });
+})();
+// 状態表示は、普段の表示（「3d_1 表示中」など）を出さず、共有の失敗などのエラーのときだけ出す。
+(() => {
+  const status = document.querySelector(".web-top .status-line");
+  const text = document.getElementById("transcriptText");
+  if (!status || !text) return;
+  const normal = /^(未接続|共有待ち|動作中|Live2D確認中)$|(表示中|読込中)$/;
+  // 英語の表示に置き換えていても、app.js が書いた元の文（data-ja）で判定する。
+  const update = () => { status.hidden = normal.test((text.dataset.ja ?? text.textContent).trim()); };
+  new MutationObserver(update).observe(text, { childList: true, characterData: true, subtree: true });
+  update();
+})();</script>
+  </body>
+</html>
